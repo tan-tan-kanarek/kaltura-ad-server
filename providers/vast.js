@@ -113,8 +113,9 @@ VastServer.prototype.listMetadataProfiles = function(taskId) {
 			return;
 		}
 
+		var metadataProfile;
 		for (var i = 0; i < list.objects.length; i++) {
-			var metadataProfile = list.objects[i];
+			metadataProfile = list.objects[i];
 			if (metadataProfile.systemName === 'AdServer') {
 				This.entriesMetadataProfileId = metadataProfile.id;
 			}
@@ -123,12 +124,12 @@ VastServer.prototype.listMetadataProfiles = function(taskId) {
 			listEntries();
 		}
 		else{
-			var metadataProfile = new kaltura.client.objects.KalturaMetadataProfile();
+			metadataProfile = new kaltura.client.objects.KalturaMetadataProfile();
 			metadataProfile.metadataObjectType = kaltura.client.enums.KalturaMetadataObjectType.ENTRY;
 			metadataProfile.name = 'Ad-Server';
 			metadataProfile.systemName = 'AdServer';
 			
-			var xsd = fs.readFileSync('./resources/metadata.xsd').toString();
+			var xsd = fs.readFileSync(__dirname + '/../resources/metadata.xsd').toString();
 			This.startTask(taskId);
 			This.client.metadataProfile.add(function(createdMetadataProfile){
 				if (createdMetadataProfile.objectType === 'KalturaAPIException') {
