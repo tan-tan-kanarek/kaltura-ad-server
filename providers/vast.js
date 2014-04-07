@@ -1,6 +1,7 @@
 /* jshint -W065 */
 
 var os = require('os');
+var fs = require('fs');
 var VAST = require('vast-xml');
 var xml2js = require('xml2js');
 
@@ -10,6 +11,7 @@ var kaltura = {
 
 function VastServer(adServer, config) {
 	this.adServer = adServer;
+	this.entriesMetadataProfileId = null;
 	this.init(config);
 }
 
@@ -22,6 +24,9 @@ VastServer.prototype.init = function(config) {
 
 var KalturaLogger = {
 	log : function(str) {
+		console.log(str);
+	},
+	debug : function(str) {
 		console.log(str);
 	}
 };
@@ -89,12 +94,18 @@ VastServer.prototype.listMetadataProfiles = function(taskId) {
 
 	this.startTask(taskId);
 	var filter = new kaltura.client.objects.KalturaMetadataProfileFilter();
+	filter.metadataObjectTypeEqual = kaltura.client.enums.KalturaMetadataObjectType.ENTRY;
 	filter.systemNameIn = 'AdServer';
 
 	var pager = new kaltura.client.objects.KalturaFilterPager();
 	pager.pageSize = 1;
 
 	var This = this;
+	var listEntries = function(){
+		This.listInLineEntries(taskId);
+		This.listWrapperEntries(taskId);
+	};
+	
 	this.client.metadataProfile.listAction(function(list) {
 		if (list.objectType === 'KalturaAPIException') {
 			console.error('Client [metadataProfile.list][' + list.code + ']: ' + list.message);
@@ -108,8 +119,28 @@ VastServer.prototype.listMetadataProfiles = function(taskId) {
 				This.entriesMetadataProfileId = metadataProfile.id;
 			}
 		}
-		This.listInLineEntries(taskId);
-		This.listWrapperEntries(taskId);
+		if(This.entriesMetadataProfileId){
+			listEntries();
+		}
+		else{
+			var metadataProfile = new kaltura.client.objects.KalturaMetadataProfile();
+			metadataProfile.metadataObjectType = kaltura.client.enums.KalturaMetadataObjectType.ENTRY;
+			metadataProfile.name = 'Ad-Server';
+			metadataProfile.systemName = 'AdServer';
+			
+			var xsd = fs.readFileSync('./resources/metadata.xsd').toString();
+			This.startTask(taskId);
+			This.client.metadataProfile.add(function(createdMetadataProfile){
+				if (createdMetadataProfile.objectType === 'KalturaAPIException') {
+					console.error('Client [metadataProfile.add][' + createdMetadataProfile.code + ']: ' + createdMetadataProfile.message);
+				}
+				else{
+					This.entriesMetadataProfileId = createdMetadataProfile.id;
+					listEntries();
+				}
+				This.commitTask(taskId);
+			}, metadataProfile, xsd);
+		}
 		This.commitTask(taskId);
 	});
 };
@@ -210,6 +241,10 @@ VastServer.prototype.handleWrapperEntriesResponse = function(taskId, list, filte
 		this.wrappers[entry.id] = entry;
 		entryIds.push(entry.id);
 	}
+	
+	if(!entryIds.length){
+		return;
+	}
 
 	// fetch entries metadata
 	var metadataFilter = new kaltura.client.objects.KalturaMetadataFilter();
@@ -285,6 +320,10 @@ VastServer.prototype.handleMediaEntriesResponse = function(taskId, list, filter,
 		entryIds.push(entry.id);
 		this.entries[entry.id] = entry;
 		this.entries[entry.id].assets = {};
+	}
+	
+	if(!entryIds.length){
+		return;
 	}
 
 	// fetch entries assets

@@ -1,6 +1,6 @@
 {
   "name": "kaltura-ad-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "VAST ad-server, based on media and metadata from Kaltura server",
   "main": "server.js",
   "repository": "https://github.com/tan-tan-kanarek/kaltura-ad-server",
@@ -10,10 +10,10 @@
     "Kaltura"
   ],
   "dependencies": {
-	  "xml2js": ">=0.4.2",
-	  "vast-xml": ">=0.3.0"
-  }
-  "author": "johnathan.kanarek@gmail.com",
+    "xml2js": ">=0.4.2",
+    "vast-xml": ">=0.3.0"
+  },
+  "author": "tan-tan",
   "license": "MIT",
   "readmeFilename": "README.md"
 }

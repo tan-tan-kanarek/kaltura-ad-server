@@ -1,0 +1,80 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="metadata">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AdType" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation/>
+						<xsd:appinfo>
+							<label>AdType</label>
+							<key>AdType</key>
+							<searchable>true</searchable>
+							<timeControl>false</timeControl>
+							<description/>
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="InLine"/>
+							<xsd:enumeration value="Wrapper"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="WrapperURI" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation></xsd:documentation>
+						<xsd:appinfo>
+							<label>WrapperURI</label>
+							<key>WrapperURI</key>
+							<searchable>false</searchable>
+							<timeControl>false</timeControl>
+							<description></description>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="WrapperWidth" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation></xsd:documentation>
+						<xsd:appinfo>
+							<label>WrapperWidth</label>
+							<key>WrapperWidth</key>
+							<searchable>false</searchable>
+							<timeControl>false</timeControl>
+							<description></description>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="WrapperHeight" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation></xsd:documentation>
+						<xsd:appinfo>
+							<label>WrapperHeight</label>
+							<key>WrapperHeight</key>
+							<searchable>false</searchable>
+							<timeControl>false</timeControl>
+							<description></description>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="textType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="dateType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:long"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="objectType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="listType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+</xsd:schema>
