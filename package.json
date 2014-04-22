@@ -1,6 +1,6 @@
 {
   "name": "kaltura-ad-server",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "VAST ad-server, based on media and metadata from Kaltura server",
   "main": "server.js",
   "repository": "https://github.com/tan-tan-kanarek/kaltura-ad-server",

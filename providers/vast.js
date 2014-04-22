@@ -390,9 +390,14 @@ VastServer.prototype.formatDuration = function(duration) {
 	return hours + ':' + minutes + ':' + seconds;
 };
 
+VastServer.prototype.getAssetUrl = function(asset, params) {
+	return asset.url;
+};
+
 VastServer.prototype.attachAsset = function(asset, creative, params) {
 
-	creative.attachMediaFile(asset.url, {
+	var assetUrl = this.getAssetUrl(asset, params);
+	creative.attachMediaFile(assetUrl, {
 		id : asset.id,
 		type : 'video/' + asset.fileExt,
 		bitrate : asset.bitrate,
@@ -435,6 +440,18 @@ VastServer.prototype.attachWrapper = function(entry, vast, params) {
 	creative.attachResource('StaticResource', entry.thumbnailUrl, 'image/jpeg');
 };
 
+VastServer.prototype.getImpressionUrl = function(entry, params) {
+	return this.adServer.address + '/report/start?id=' + entry.id;
+};
+
+VastServer.prototype.getTrackingUrl = function(entry, eventType, params) {
+	return this.adServer.address + '/report/' + eventType + '?id=' + entry.id;
+};
+
+VastServer.prototype.getVideoClickUrl = function(entry, eventType, params) {
+	return this.adServer.address + '/report/' + eventType + '?id=' + entry.id;
+};
+
 VastServer.prototype.attachEntry = function(entry, vast, params) {
 	var This = this;
 
@@ -452,7 +469,7 @@ VastServer.prototype.attachEntry = function(entry, vast, params) {
 
 	ad.attachImpression({
 		id : 'started',
-		url : This.adServer.address + '/report/start?id=' + entry.id
+		url : This.getImpressionUrl(entry, params)
 	});
 
 	var creative = ad.attachCreative('Linear', {
@@ -461,12 +478,12 @@ VastServer.prototype.attachEntry = function(entry, vast, params) {
 	});
 
 	for(var i = 0; i < VALID_TRACKING_EVENT_TYPES.length; i++){
-		creative.attachTrackingEvent(VALID_TRACKING_EVENT_TYPES[i], This.adServer.address + '/report/' + VALID_TRACKING_EVENT_TYPES[i] + '?id=' + entry.id);
+		creative.attachTrackingEvent(VALID_TRACKING_EVENT_TYPES[i], This.getTrackingUrl(entry, VALID_TRACKING_EVENT_TYPES[i], params));
 	}
 
-	creative.attachVideoClick('ClickThrough', This.adServer.address + '/report/ClickThrough?id=' + entry.id, entry.id);
-	creative.attachVideoClick('ClickTracking', This.adServer.address + '/report/ClickTracking?id=' + entry.id, entry.id);
-	creative.attachVideoClick('CustomClick', This.adServer.address + '/report/CustomClick?id=' + entry.id, entry.id);
+	creative.attachVideoClick('ClickThrough', This.getVideoClickUrl(entry, 'ClickThrough', params), entry.id);
+	creative.attachVideoClick('ClickTracking', This.getVideoClickUrl(entry, 'ClickTracking', params), entry.id);
+	creative.attachVideoClick('CustomClick', This.getVideoClickUrl(entry, 'CustomClick', params), entry.id);
 
 	for ( var assetId in entry.assets) {
 		this.attachAsset(entry.assets[assetId], creative, params);
